@@ -7,7 +7,7 @@ mem="5gb"
 walltime="1000"
 
 function call_help {
-        echo "Usage: qg [-q:-t:] list_of_input_files"
+        echo "Usage: qmulti [-t:] list_of_input_files"
         echo "-t Requested Walltime in hours, def 1000"
         exit 1
 }
@@ -42,7 +42,7 @@ do
         then
                 echo "Walltime  : Queue Default"
         else
-                echo "Walltime,h: " $walltime
+                echo "Walltime, " $walltime
                 qwalltime="-l walltime="$(($walltime*60*60))
         fi
 
