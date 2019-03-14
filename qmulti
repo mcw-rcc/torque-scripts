@@ -1,0 +1,62 @@
+#!/bin/bash
+
+#Set up parameters
+nodes=1
+cores=1
+mem="5gb"
+walltime="1000"
+
+function call_help {
+        echo "Usage: qg [-q:-t:] list_of_input_files"
+        echo "-t Requested Walltime in hours, def 1000"
+        exit 1
+}
+
+#Read command line
+while getopts t:h o
+do
+	case $o in
+		t)	walltime="$OPTARG";;
+		h)	call_help;;
+	esac
+done
+shift "$(($OPTIND - 1))"
+
+if [ -z "$*"  ] ; then
+        call_help
+fi 
+
+
+
+for input in $*
+do
+
+        if [ ! -f $input ]
+        then
+                echo "File $input not found"
+                continue
+        fi
+        echo "Input file: " $input
+
+        if [ -z "$walltime" ]
+        then
+                echo "Walltime  : Queue Default"
+        else
+                echo "Walltime,h: " $walltime
+                qwalltime="-l walltime="$(($walltime*60*60))
+        fi
+
+
+#Now we are ready to put our task in the queue
+qsub << EOF
+#PBS -N $input
+#PBS -l nodes=$nodes:ppn=$cores,$mem,$qwalltime
+#PBS -j oe
+cd \$PBS_O_WORKDIR
+
+runMyScript
+EOF
+
+done
+qstat -u `whoami`
+
